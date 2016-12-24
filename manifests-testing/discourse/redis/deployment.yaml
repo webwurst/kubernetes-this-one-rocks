@@ -1,0 +1,53 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: discourse-redis
+  namespace: discourse
+  labels:
+    app: discourse
+    component: redis
+spec:
+  template:
+    metadata:
+      labels:
+        app: discourse
+        component: redis
+    spec:
+      containers:
+      - name: discourse-redis
+        image: redis:3.2.6
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: REDIS_PASSWORD
+          value: redis
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: {{ template "fullname" . }}
+          #     key: redis-password
+        ports:
+        - name: redis
+          containerPort: 6379
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+#         resources:
+# {{ toYaml .Values.resources | indent 10 }}
+        volumeMounts:
+          # /usr/local/etc/redis/redis.conf
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        hostPath:
+          path: /srv/discourse/discourse-redis-data

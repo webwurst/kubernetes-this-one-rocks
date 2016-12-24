@@ -1,0 +1,11 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: discourse
+  namespace: discourse
+data:
+  hostname: discourse.thisone.rocks
+  smtp-address: smtp.sparkpostmail.com
+  smtp-port: "587"
+  smtp-username: SMTP_Injection
+  developer-emails: webwurst@gmail.com

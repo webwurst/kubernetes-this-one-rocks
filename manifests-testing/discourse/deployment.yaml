@@ -1,0 +1,100 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: discourse-main
+  namespace: discourse
+  labels:
+    app: discourse
+    component: main
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: discourse-main
+      labels:
+        app: discourse
+        component: main
+      annotations:
+        scheduler.alpha.kubernetes.io/affinity: >
+          {
+            "nodeAffinity": {
+              "requiredDuringSchedulingIgnoredDuringExecution": {
+                "nodeSelectorTerms": [
+                  {
+                    "matchExpressions": [
+                      {
+                        "key": "affinity/discourse",
+                        "operator": "In",
+                        "values": ["true"]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+    spec:
+      containers:
+      - name: server
+        image: dockermuenster/discourse:1.7.0.beta9
+        ports:
+        - name: web
+          containerPort: 3000
+        env:
+        - name: DISCOURSE_HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              name: discourse
+              key: hostname
+        - name: DISCOURSE_SMTP_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              name: discourse
+              key: smtp-address
+        - name: DISCOURSE_SMTP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: discourse
+              key: smtp-port
+        - name: DISCOURSE_SMTP_USER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: discourse
+              key: smtp-username
+        - name: DISCOURSE_DEVELOPER_EMAILS
+          valueFrom:
+            configMapKeyRef:
+              name: discourse
+              key: developer-emails
+        - name: SECRET_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: discourse
+              key: secret-token
+        - name: DISCOURSE_SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: discourse
+              key: smtp-password
+        - name: DISCOURSE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: discourse
+              key: postgres-password
+        volumeMounts:
+        - name: assets
+          mountPath: /usr/src/app/public/assets
+        - name: uploads
+          mountPath: /usr/src/app/public/uploads
+        - name: backups
+          mountPath: /usr/src/app/public/backups
+      volumes:
+      - name: assets
+        hostPath:
+          path: /srv/discourse-assets
+      - name: uploads
+        hostPath:
+          path: /srv/discourse-uploads
+      - name: backups
+        hostPath:
+          path: /srv/discourse-backups

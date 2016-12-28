@@ -37,7 +37,8 @@ spec:
       containers:
       - name: discourse-main
         image: dockermuenster/discourse:1.7.0.beta9
-        command: ["sleep", "infinity"]
+        command: ["sidekiq", "--concurrency", "3", "--verbose"]
+        # command: ["sleep", "infinity"]
         env:
         - name: DISCOURSE_HOSTNAME
           valueFrom:

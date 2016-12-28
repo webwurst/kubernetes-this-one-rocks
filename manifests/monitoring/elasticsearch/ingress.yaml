@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: elasticsearch
+  namespace: monitoring
+  labels:
+    app: elasticsearch
+    component: ingress
+  annotations:
+    ingress.kubernetes.io/auth-secret: elasticsearch-basic-auth
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-realm: "thisone"
+    kubernetes.io/tls-acme: "true"
+spec:
+  rules:
+  - host: elasticsearch.kube.thisone.rocks
+    http:
+      paths:
+      - backend:
+          serviceName: elasticsearch
+          servicePort: 9200
+        path: /
+  tls:
+  - hosts:
+    - elasticsearch.kube.thisone.rocks
+    secretName: elasticsearch-tls

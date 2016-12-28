@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dashboard
+  namespace: kube-system
+  labels:
+    app: dashboard
+  annotations:
+    ingress.kubernetes.io/auth-secret: dashboard-basic-auth
+    ingress.kubernetes.io/auth-type: basic
+    ingress.kubernetes.io/auth-realm: "thisone"
+    kubernetes.io/tls-acme: "true"
+spec:
+  rules:
+  - host: dashboard.kube.thisone.rocks
+    http:
+      paths:
+      - backend:
+          serviceName: kubernetes-dashboard
+          servicePort: 9090
+        path: /
+  tls:
+  - hosts:
+    - dashboard.kube.thisone.rocks
+    secretName: dashboard-tls

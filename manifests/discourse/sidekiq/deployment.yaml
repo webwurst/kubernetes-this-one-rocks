@@ -50,6 +50,11 @@ spec:
             configMapKeyRef:
               name: discourse
               key: smtp-address
+        # - name: DISCOURSE_SMTP_DOMAIN
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: discourse
+        #       key: smtp-domain
         - name: DISCOURSE_SMTP_PORT
           valueFrom:
             configMapKeyRef:
